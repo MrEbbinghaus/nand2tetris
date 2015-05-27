@@ -148,7 +148,7 @@ if len(argv) > 1:
 else:
 	print(	"Input format wrong!\n"+
 			"Correct input format (output optional): \n"+
-			"python3 parser.py input (output)")
+			"python3 assembler.py input (output)")
 	exit(1)
 	
 
