@@ -1,4 +1,6 @@
 from sys import argv
+from os import path
+from re import sub
 
 stack = []
 
@@ -7,14 +9,18 @@ def gen_gen(string):
 		x = 0
 		while (True):
 			yield string.format(x)
-			x = x +1
+			x = x + 1
 	return gen
+
+primitves = {"add","sub","neg","and","or","not"}
+primitves_c = {"eq","gt","lt"}
+memoryCMDs = {"push"}
 
 functionTable = {
 #tested: add, sub, neg, and, eq 
 	"add": "@SP\nAM=M-1\nD=M\nA=A-1\nM=M+D\n",
 	"sub": "@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D\n",
-	"neg": "@SP\nA=M\nM=-M\n",
+	"neg": "@SP\nA=M-1\nM=-M\n",
 
 	"eq" : gen_gen("@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@EQ_End{0}\nD;JEQ\n@SP\nA=M-1\nM=0\n(EQ_End{0})\n")(),
 	"gt" : gen_gen("@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@GT_End{0}\nD;JGT\n@SP\nA=M-1\nM=0\n(GT_End{0})\n")(),
@@ -24,13 +30,23 @@ functionTable = {
 	"or" : "@SP\nAM=M-1\nD=M\nA=A-1\nM=D|M\n",
 	"not": "@SP\nA=M-1\nM=!M\n",
 
-	"push": ""
+	"push": "@{0}\nD=A\n@SP\nAM=M+1\nA=A-1\nM=D\n"
 }
 
-def parse():
-	print( next(functionTable["eq"]) )
+def functionTableWrapper(cmd):
+	cmd = cmd.split()
+	if cmd[0] in primitves:
+		return functionTable[cmd[0]]
+	elif cmd[0] in primitves_c:
+		return next(functionTable[cmd[0]])
+	elif cmd[0] in memoryCMDs:
+		if cmd[1] == "constant":
+			return functionTable[cmd[0]].format(int(cmd[2]))
 
-'''
+
+def parse(string):
+	return( functionTableWrapper(string))
+
 #start!
 if len(argv) > 1:
 	in_file = argv[1]
@@ -51,6 +67,12 @@ lines = file_input.readlines()
 lines = map (lambda line: sub(r"//.*","", line), lines) #clear comments
 lines = list ( filter(None, map(str.strip, lines) ) ) #clear whitespace & empty lines
 file_input.close()
-'''
-parse()
-parse()
+
+out_lines = list( map(parse, lines) )
+
+#print(out_lines)
+
+file_output = open( output_name, "w")
+file_output.writelines( out_lines )
+file_output.close()
+print ( "Done!" )
