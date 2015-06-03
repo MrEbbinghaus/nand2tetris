@@ -45,13 +45,13 @@ functionTable = {
 	"pop_argument"	: "@ARG\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
 	"pop_this"		: "@THIS\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
 	"pop_that"		: "@THAT\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
-	"pop_temp"		: "@5\nD=A\n@{0}\nD=A+D\n@R13\nM=D\n"
+	"pop_temp"		: "@5\nD=A\n@{0}\nD=A+D\n@R13\nM=D\n",
+	"pop_pointer"	: "@THIS\nD=A\n@{0}\nD=A+D\n@R13\nM=D\n"
 
 }
 
 def functionTableWrapper(cmd):
 	cmd = cmd.split()
-	print(cmd[0])
 	if cmd[0] in primitves:
 
 		return functionTable[cmd[0]]
