@@ -2,7 +2,7 @@ from sys import argv
 from os import path
 from re import sub
 
-stack = []
+counter = -1
 
 def gen_gen(string):
 	def gen():
@@ -22,30 +22,51 @@ functionTable = {
 	"sub": "@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D\n",
 	"neg": "@SP\nA=M-1\nM=-M\n",
 
-	"eq" : gen_gen("@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@EQ_End{0}\nD;JEQ\n@SP\nA=M-1\nM=0\n(EQ_End{0})\n")(),
-	"gt" : gen_gen("@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@GT_End{0}\nD;JGT\n@SP\nA=M-1\nM=0\n(GT_End{0})\n")(),
-	"lt" : gen_gen("@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@LT_End{0}\nD;JLT\n@SP\nA=M-1\nM=0\n(LT_End{0})\n")(),
+	"eq" : "@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@EQ_End{0}\nD;JEQ\n@SP\nA=M-1\nM=0\n(EQ_End{0})\n",
+	"gt" : "@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@GT_End{0}\nD;JGT\n@SP\nA=M-1\nM=0\n(GT_End{0})\n",
+	"lt" : "@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@LT_End{0}\nD;JLT\n@SP\nA=M-1\nM=0\n(LT_End{0})\n",
 
 	"and": "@SP\nAM=M-1\nD=M\nA=A-1\nM=D&M\n",
 	"or" : "@SP\nAM=M-1\nD=M\nA=A-1\nM=D|M\n",
 	"not": "@SP\nA=M-1\nM=!M\n",
 
-	"push": "@{0}\nD=A\n@SP\nAM=M+1\nA=A-1\nM=D\n"
+	"push"			: "@SP\nAM=M+1\nA=A-1\nM=D\n",
+	"push_constant"	: "@{0}\nD=A\n",
+	"push_local"	: "@{0}\nD=A\n@LCL\nA=M+D\nD=M\n",
+	"push_argument"	: "@{0}\nD=A\n@ARG\nA=M+D\nD=M\n",
+	"push_this"		: "@{0}\nD=A\n@THIS\nA=M+D\nD=M\n",
+	"push_that"		: "@{0}\nD=A\n@THAT\nA=M+D\n\nD=M\n",
+	"push_temp"		: "@{0}\nD=A\n@5\nA=A+D\n\nD=M\n",
+	"push_pointer"	: "@{0}\nD=A\n@THIS\nA=A+D\nD=M\n",
+	"push_static"	: "@{0}\nD=A\n@16\nA=A+D\nD=M\n",
+
+	"pop"			: "@SP\nAM=M-1\nD=M\n@R13\nA=M\nM=D\n",
+	"pop_local"		: "@LCL\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
+	"pop_argument"	: "@ARG\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
+	"pop_this"		: "@THIS\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
+	"pop_that"		: "@THAT\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
+	"pop_temp"		: "@5\nD=A\n@{0}\nD=A+D\n@R13\nM=D\n"
+
 }
 
 def functionTableWrapper(cmd):
 	cmd = cmd.split()
+	print(cmd[0])
 	if cmd[0] in primitves:
+
 		return functionTable[cmd[0]]
 	elif cmd[0] in primitves_c:
-		return next(functionTable[cmd[0]])
-	elif cmd[0] in memoryCMDs:
-		if cmd[1] == "constant":
-			return functionTable[cmd[0]].format(int(cmd[2]))
+		global counter
+		counter += 1
+		return functionTable[cmd[0]].format(counter)
+	elif cmd[0] == "push":
+		return functionTable[cmd[0]+"_"+cmd[1]].format(int(cmd[2])) + functionTable[cmd[0]]
+	elif cmd[0] == "pop":
+		return functionTable[cmd[0]+"_"+cmd[1]].format(int(cmd[2])) + functionTable[cmd[0]]
 
 
 def parse(string):
-	return( functionTableWrapper(string))
+	return( functionTableWrapper(string) )
 
 #start!
 if len(argv) > 1:
