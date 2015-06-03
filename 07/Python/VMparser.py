@@ -40,13 +40,14 @@ functionTable = {
 	"push_pointer"	: "@{0}\nD=A\n@THIS\nA=A+D\nD=M\n",
 	"push_static"	: "@{0}\nD=A\n@16\nA=A+D\nD=M\n",
 
-	"pop"			: "@SP\nAM=M-1\nD=M\n@R13\nA=M\nM=D\n",
-	"pop_local"		: "@LCL\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
-	"pop_argument"	: "@ARG\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
-	"pop_this"		: "@THIS\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
-	"pop_that"		: "@THAT\nD=M\n@{0}\nD=A+D\n@R13\nM=D\n",
-	"pop_temp"		: "@5\nD=A\n@{0}\nD=A+D\n@R13\nM=D\n",
-	"pop_pointer"	: "@THIS\nD=A\n@{0}\nD=A+D\n@R13\nM=D\n"
+	"pop"			: "\nD=A+D\n@R13\nM=D\n@SP\nAM=M-1\nD=M\n@R13\nA=M\nM=D\n",
+	"pop_local"		: "@LCL\nD=M\n@{0}",
+	"pop_argument"	: "@ARG\nD=M\n@{0}",
+	"pop_this"		: "@THIS\nD=M\n@{0}",
+	"pop_that"		: "@THAT\nD=M\n@{0}",
+	"pop_temp"		: "@5\nD=A\n@{0}",
+	"pop_pointer"	: "@THIS\nD=A\n@{0}",
+	"pop_static"	: "@16\nD=A\n@{0}"
 
 }
 
