@@ -48,13 +48,12 @@ cmdTable = {
 }
 
 def buildDict(lines):
-	for x in range(0,15):
+	for x in range(0,16):
 		symbolTable["R"+str(x)] = x
 
 	lineCounter = 0
 	for line in lines:
 		if line[0] == '(' :
-			foo = 1
 			line = line.strip('()')
 			if line not in symbolTable:
 				symbolTable[line] = lineCounter
@@ -79,7 +78,7 @@ def parseA(line):
 			value = symbolTable[line[1:]]
 			ret += IToXbitBin(value, 15)
 		else:
-			memoryCounter = 0
+			global memoryCounter
 			while( memoryCounter in symbolTable.values() and memoryCounter < int("4000",16) ):
 				memoryCounter += 1
 			symbolTable[ line[1:] ] = memoryCounter

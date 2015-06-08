@@ -4,20 +4,10 @@ from re import sub
 
 counter = -1
 
-def gen_gen(string):
-	def gen():
-		x = 0
-		while (True):
-			yield string.format(x)
-			x = x + 1
-	return gen
-
 primitves = {"add","sub","neg","and","or","not"}
 primitves_c = {"eq","gt","lt"}
-memoryCMDs = {"push"}
 
-functionTable = {
-#tested: add, sub, neg, and, eq 
+functionTable = { 
 	"add": "@SP\nAM=M-1\nD=M\nA=A-1\nM=M+D\n",
 	"sub": "@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D\n",
 	"neg": "@SP\nA=M-1\nM=-M\n",
@@ -51,10 +41,9 @@ functionTable = {
 
 }
 
-def functionTableWrapper(cmd):
+def parseLine(cmd):
 	cmd = cmd.split()
 	if cmd[0] in primitves:
-
 		return functionTable[cmd[0]]
 	elif cmd[0] in primitves_c:
 		global counter
@@ -64,10 +53,6 @@ def functionTableWrapper(cmd):
 		return functionTable[cmd[0]+"_"+cmd[1]].format(int(cmd[2])) + functionTable[cmd[0]]
 	elif cmd[0] == "pop":
 		return functionTable[cmd[0]+"_"+cmd[1]].format(int(cmd[2])) + functionTable[cmd[0]]
-
-
-def parse(string):
-	return( functionTableWrapper(string) )
 
 #start!
 if len(argv) > 1:
@@ -90,7 +75,7 @@ lines = map (lambda line: sub(r"//.*","", line), lines) #clear comments
 lines = list ( filter(None, map(str.strip, lines) ) ) #clear whitespace & empty lines
 file_input.close()
 
-out_lines = list( map(parse, lines) )
+out_lines = list( map(parseLine, lines) )
 
 #print(out_lines)
 
