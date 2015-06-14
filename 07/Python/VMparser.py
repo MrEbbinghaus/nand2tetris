@@ -1,10 +1,15 @@
 from sys import argv
-from os import path
+from os import listdir
+from os.path import join, basename, splitext, isdir, normpath
 from re import sub
 
 counter = -1
+retCounter = -1
 
-currF = ""
+error = False
+
+currFunction = ""
+currClass = ""
 
 primitves = {"add","sub","neg","and","or","not"}
 primitves_c = {"eq","gt","lt"}
@@ -32,48 +37,46 @@ functionTable = {
 	"push_that"		: "@{0}\nD=A\n@THAT\nA=M+D\nD=M\n",
 	"push_temp"		: "@{0}\nD=A\n@5\nA=A+D\nD=M\n",
 	"push_pointer"	: "@{0}\nD=A\n@THIS\nA=A+D\nD=M\n",
-	"push_static"	: "@{0}\nD=A\n@16\nA=A+D\nD=M\n",
+	"push_static"	: "@{0}\nD=M\n",
 
-	"pop"			: "\nD=A+D\n@R13\nM=D\n@SP\nAM=M-1\nD=M\n@R13\nA=M\nM=D\n",
-	"pop_local"		: "@LCL\nD=M\n@{0}",
-	"pop_argument"	: "@ARG\nD=M\n@{0}",
-	"pop_this"		: "@THIS\nD=M\n@{0}",
-	"pop_that"		: "@THAT\nD=M\n@{0}",
-	"pop_temp"		: "@5\nD=A\n@{0}",
-	"pop_pointer"	: "@THIS\nD=A\n@{0}",
-	"pop_static"	: "@16\nD=A\n@{0}",
+	"pop"			: "\n@R13\nM=D\n@SP\nAM=M-1\nD=M\n@R13\nA=M\nM=D\n",
+	"pop_local"		: "@LCL\nD=M\n@{0}\nD=A+D",
+	"pop_argument"	: "@ARG\nD=M\n@{0}\nD=A+D",
+	"pop_this"		: "@THIS\nD=M\n@{0}\nD=A+D",
+	"pop_that"		: "@THAT\nD=M\n@{0}\nD=A+D",
+	"pop_temp"		: "@5\nD=A\n@{0}\nD=A+D",
+	"pop_pointer"	: "@THIS\nD=A\n@{0}\nD=A+D",
+	"pop_static"	: "@{0}\nD=A",
 
 	"label"			: "({0})\n",
 	"goto"			: "@{0}\n0;JMP\n",
 	"if-goto"		: "@SP\nAM=M-1\nD=M\n@{0}\nD;JNE\n",
 
-	"call"			: """
-@{0}\nD=A\n@SP\nAM=M+1\nA=A-1\nM=D
-@LCL\nD=M\n@SP\nAM=M+1\nA=A-1\nM=D
-@ARG\nD=M\n@SP\nAM=M+1\nA=A-1\nM=D
-@THIS\nD=M\n@SP\nAM=M+1\nA=A-1\nM=D
-@THAT\nD=M\n@SP\nAM=M+1\nA=A-1\nM=D
-@{1}\nD=A\n@5\nD=D-A\n@SP\nA=M\nD=A-D\n@ARG\nM=D
-@Sp\nA=M\nD=M\n@LCL\nM=D
-@{2}\n0;JMP
-({0})\n
-""",
+	"call"			: "@{0}$return\nD=A\n@SP\nAM=M+1\nA=A-1\nM=D\n"+
+						"@LCL\nD=M\n@SP\nAM=M+1\nA=A-1\nM=D\n"+
+						"@ARG\nD=M\n@SP\nAM=M+1\nA=A-1\nM=D\n"+
+						"@THIS\nD=M\n@SP\nAM=M+1\nA=A-1\nM=D\n"+
+						"@THAT\nD=M\n@SP\nAM=M+1\nA=A-1\nM=D\n"+
+						"@{1}\nD=A\n@5\nD=D+A\n@SP\nA=M\nD=A-D\n@ARG\nM=D\n"+
+						"@Sp\nA=M\nD=M\n@LCL\nM=D\n"+
+						"@{2}\n0;JMP\n"+
+						"({0}$return)\n",
 
-	"return"		: """
-@LCL\nD=M\n@R13\nM=D
-@5\nD=A\n@R13\nD=M-D\n@R14\nM=D
-@SP\nA=M-1\nD=M\n@ARG\nA=M\nM=D
-@ARG\nD=M\n@SP\nM=D+1
-@R13\nAM=M-1\nD=M\n@THAT\nM=D
-@R13\nAM=M-1\nD=M\n@THIS\nM=D
-@R13\nAM=M-1\nD=M\n@ARG\nM=D
-@R13\nAM=M-1\nD=M\n@LCL\nM=D
-@R14\nA=M\n0;JMP\n"""
+	"return"		: "@LCL\nD=M\n@R13\nM=D\n"+
+						"@5\nD=A\n@R13\nA=M-D\nD=M\n@R14\nM=D\n"+
+						"@SP\nA=M-1\nD=M\n@ARG\nA=M\nM=D\n"+
+						"@ARG\nD=M\n@SP\nM=D+1\n"+
+						"@R13\nAM=M-1\nD=M\n@THAT\nM=D\n"+
+						"@R13\nAM=M-1\nD=M\n@THIS\nM=D\n"+
+						"@R13\nAM=M-1\nD=M\n@ARG\nM=D\n"+
+						"@R13\nAM=M-1\nD=M\n@LCL\nM=D\n"+
+						"@R14\nA=M\n0;JMP\n"
 }
 
 
 def parseLine(cmd):
-	global currF
+	global currFunction
+	orgCmd = cmd
 	cmd = cmd.split()
 
 	if cmd[0] in primitves:
@@ -85,51 +88,92 @@ def parseLine(cmd):
 		return functionTable[cmd[0]].format(counter)
 
 	elif cmd[0] in memOps:
-		return functionTable[ cmd[0]+"_"+cmd[1] ].format( int(cmd[2]) ) + functionTable[cmd[0]]
+		if cmd[1] == "static":
+			print( currClass +'.'+ cmd[2] )
+			return functionTable[ cmd[0]+"_"+cmd[1] ].format( currClass +'.'+ cmd[2] ) + functionTable[cmd[0]]
+		else:
+			return functionTable[ cmd[0]+"_"+cmd[1] ].format( int(cmd[2]) ) + functionTable[cmd[0]]
 
 	elif cmd[0] == "function":
-		currF = cmd[1]
+		currFunction = cmd[1]
 		pushes = ""
 		for i in range( 0, int(cmd[2]) ):
 			pushes += parseLine("push constant 0")
-		return functionTable["label"].format(currF) + pushes
+		return functionTable["label"].format(currFunction) + pushes
 
 	elif cmd[0] in jmpOps:
-		return functionTable[cmd[0]].format(currF + '$' + cmd[1] )
+		return functionTable[cmd[0]].format(currFunction + '$' + cmd[1] )
 
 	elif cmd[0] == "call":
-		return functionTable[ cmd[0] ].format(currF, cmd[2], cmd[1])
+		global retCounter
+		retCounter += 1
+		return functionTable[ cmd[0] ].format(currFunction+'.'+cmd[1]+str(retCounter), cmd[2], cmd[1])
 
 	elif cmd[0] == "return":
 		return functionTable["return"]
 
+	else:
+		global error
+		error = True
+		print ("ERROR: invalid command: \"" + orgCmd+"\"")
+		return orgCmd + "\t\t\t<=== ERROR\n"
+
+def parseFile(file):
+	currClass = file.split(".")[0]
+	file_input = open (file, "r")
+
+	lines = file_input.readlines()
+
+	lines = map (lambda line: sub(r"//.*","", line), lines) #clear comments
+	lines = list ( filter(None, map(str.strip, lines) ) ) #clear whitespace & empty lines
+	file_input.close()
+
+	return list( map(parseLine, lines) )
 
 #start!
-if len(argv) > 1:
-	in_file = argv[1]
-	output_name = path.splitext(in_file)[0] + ".asm"
-	if len(argv) > 2:
-		output_name = argv[2]
-else:
-	print(	"Input format wrong!\n"+
-			"Correct input format (output optional): \n"+
-			"python3 VMparser.py input (output)")
-	exit(1)
+def main():
+	if len(argv) > 1:
+		inFile = argv[1]
+		if not isdir(inFile):
+			output_name = splitext( basename( normpath(inFile) ))[0] + ".asm"
+			output = parseFile(inFile)
+
+		else:
+			output = ["@256\nD=A\n@0\nM=D\n", functionTable["call"].format("Pre.pre", "0", "Sys.init") ]
+			for file in listdir(inFile):
+
+				if file.endswith(".vm"):
+					print("Parsing: "+str(file))
+					global currClass
+					currClass = splitext(file)[0]
+					output += parseFile(join(inFile, file))
+					#print ( output )
+
+		output_name = join(inFile,  basename( normpath(inFile) ) + ".asm")
 
 
-file_input = open (in_file, "r")
+		if len(argv) > 2:
+			output_name = argv[2]
+	else:
+		print(	"Input format wrong!\n"+
+				"Correct input format (output optional):\n"+
+				"python3 VMparser.py input (output)\n" )
+		exit(1)
 
-lines = file_input.readlines()
 
-lines = map (lambda line: sub(r"//.*","", line), lines) #clear comments
-lines = list ( filter(None, map(str.strip, lines) ) ) #clear whitespace & empty lines
-file_input.close()
+	file_output = open( output_name, "w" )
+	print ( "Save to: " + output_name )
+	file_output.writelines( output )
+	file_output.close()
 
-out_lines = list( map(parseLine, lines) )
+	endmsg = "Done"
 
-#print(out_lines)
+	if error:
+		endmsg += ", but an error occured. To find the broken line, please review the output file."
+	else:
+		endmsg += "!"
 
-file_output = open( output_name, "w")
-file_output.writelines( out_lines )
-file_output.close()
-print ( "Done!" )
+	print ( endmsg )
+
+if __name__ == "__main__":
+	main()
