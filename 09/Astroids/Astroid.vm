@@ -201,6 +201,25 @@ label IF_FALSE3
 label IF_END2
 push constant 0
 return
+function Astroid.doDmg 0
+push argument 0
+pop pointer 0
+push this 3
+push argument 1
+sub
+pop this 3
+push this 3
+push constant 1
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+return
+label IF_FALSE0
+push constant 0
+return
 function Astroid.getPosX 0
 push argument 0
 pop pointer 0

@@ -41,12 +41,12 @@ class Game {
         let running = true;
         let ship = Spaceship.new(256, 128, 0, 0, 87, 68, 65);
 
-        do astro_list.addAstro( Astroid.new(270, 128, 5, 100, 1, 0) );
+        do astro_list.addAstro( Astroid.new(270, 128, 5, 50, 1, 0) );
         do astro_list.addAstro( Astroid.new(15, 25, 10, 100, 1, 1) );
-        do astro_list.addAstro( Astroid.new(500, 240, 10, 100, -1, -1) );
-        do astro_list.addAstro( Astroid.new(234, 240, 10, 100, 0, -1) );
-        do astro_list.addAstro( Astroid.new(34, 240, 10, 100, -1, 1) );
-        do astro_list.addAstro( Astroid.new(143, 34, 10, 100, 1, 2) );
+        do astro_list.addAstro( Astroid.new(500, 240, 5, 200, -1, -1) );
+        do astro_list.addAstro( Astroid.new(234, 240, 3, 10, 0, -1) );
+        do astro_list.addAstro( Astroid.new(34, 240, 12, 100, -1, 1) );
+        do astro_list.addAstro( Astroid.new(143, 34, 8, 100, 1, 2) );
 
 
 
@@ -64,10 +64,12 @@ class Game {
             do drawAstroList();
 
 
-            do ship.refresh(tick);
-            do ship.draw();
 
-            do proj_list.addAstro( ship.shot() );
+
+
+            do proj_list.addAstro( ship.refresh(tick) );
+
+            do ship.draw();
             do drawProjList();
 
             do handleCollision( ship );
@@ -154,9 +156,11 @@ class Game {
                 let proj = tmp2.getAstroItem();
 
                 if( Tools.checkForCollision( astro, proj ) ){
-                    do astro_list.removeAstro( astro );
                     do proj_list.removeAstro( proj );
-                    let score = score+1;
+                    if( astro.doDmg(40) ){
+                        do astro_list.removeAstro( astro );
+                        let score = score+1;
+                    }
                 }
 
                 let tmp2 = tmp2.getNext();

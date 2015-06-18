@@ -4,6 +4,7 @@ class Spaceship{
     field int key;
     field int keyS, keyR, keyL;
     field int keyPollRate;
+    field boolean fire;
 
     constructor Spaceship new(int in_posX, int in_posY, int in_vX, int in_vY, int in_key_speed, int in_key_r, int in_key_l){
         let posX = in_posX;
@@ -26,8 +27,7 @@ class Spaceship{
         return;
     }
 
-    method void refresh(int tick){
-
+    method Astroid refresh(int tick){
 
         let key = Keyboard.keyPressed();
 
@@ -56,13 +56,13 @@ class Spaceship{
         let posX = posX + vX;
         let posY = posY + vY;
 
-        if(posX+3 > 511){ let posX = 4+Constant.BARSIZE(); }
-        else{ if(posX-3 < Constant.BARSIZE()){ let posX = 508; }}
+        if(posX+dimX > 511){ let posX = dimX; }
+        else{ if(posX-dimX < 0){ let posX = 512-dimX; }}
 
-        if(posY+3 > 255){ let posY = 4+Constant.BARSIZE(); }
-        else{ if(posY-3 < Constant.BARSIZE()){ let posY = 251; }}
+        if(posY+dimY > 255){ let posY = dimY+Constant.BARSIZE(); }
+        else{ if(posY-dimY < Constant.BARSIZE()){ let posY = 255-dimY; }}
 
-        return;
+        return shot(tick);
     }
 
     method void refreshV(){
@@ -98,15 +98,9 @@ class Spaceship{
         while( ~( tmp = null ) ){
             let astro = tmp.getAstroItem();
 
-            //checkCollision
-
             if (Tools.checkForCollisionAS( astro, this ) ) {
                 return astro;
             }
-
-
-
-            ////////
 
 
             let tmp = tmp.getNext();
@@ -116,36 +110,40 @@ class Spaceship{
 
     }
 
-    method Astroid shot(){
+    method Astroid shot(int tick){
         var int vPX, vPY;
-        if(Keyboard.keyPressed() = 32){
-            if((dir=0) | (dir=1) | (dir=7)){
-                let vPY = -3;
-            }else {
-                if((dir=3) | (dir=4) | (dir=5)){
-                    let vPY = 3;
-                }
-                else {
-                    let vPY = 0;
-                }
-            }
 
-            if((dir=5)|(dir=6)|(dir=7)){
-                let vPX = -3;
-            }else {
-                if((dir=1) | (dir=2) | (dir=3)){
-                    let vPX = 3;
-                }
-                else {
-                    let vPX = 0;
-                }
-            }
+        let fire = (Keyboard.keyPressed() = 32);
 
-            return Astroid.new(posX, posY, 1,0, vPX, vPY);
+        if( Tools.mod(tick, 10) = 0 ){
+            if(fire){
+                let fire = false;
+                if((dir=0) | (dir=1) | (dir=7)){
+                    let vPY = -3;
+                }else {
+                    if((dir=3) | (dir=4) | (dir=5)){
+                        let vPY = 3;
+                    }
+                    else {
+                        let vPY = 0;
+                    }
+                }
+
+                if((dir=5)|(dir=6)|(dir=7)){
+                    let vPX = -3;
+                }else {
+                    if((dir=1) | (dir=2) | (dir=3)){
+                        let vPX = 3;
+                    }
+                    else {
+                        let vPX = 0;
+                    }
+                }
+
+                return Astroid.new(posX, posY, 0,0, vPX, vPY);
+            }
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     method void draw(){

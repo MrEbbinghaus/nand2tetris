@@ -91,7 +91,7 @@ push this 1
 push constant 270
 push constant 128
 push constant 5
-push constant 100
+push constant 50
 push constant 1
 push constant 0
 call Astroid.new 6
@@ -110,8 +110,8 @@ pop temp 0
 push this 1
 push constant 500
 push constant 240
-push constant 10
-push constant 100
+push constant 5
+push constant 200
 push constant 1
 neg
 push constant 1
@@ -122,8 +122,8 @@ pop temp 0
 push this 1
 push constant 234
 push constant 240
+push constant 3
 push constant 10
-push constant 100
 push constant 0
 push constant 1
 neg
@@ -133,7 +133,7 @@ pop temp 0
 push this 1
 push constant 34
 push constant 240
-push constant 10
+push constant 12
 push constant 100
 push constant 1
 neg
@@ -144,7 +144,7 @@ pop temp 0
 push this 1
 push constant 143
 push constant 34
-push constant 10
+push constant 8
 push constant 100
 push constant 1
 push constant 2
@@ -190,17 +190,14 @@ pop temp 0
 push pointer 0
 call Game.drawAstroList 1
 pop temp 0
+push this 2
 push this 3
 push this 4
 call Spaceship.refresh 2
+call List.addAstro 2
 pop temp 0
 push this 3
 call Spaceship.draw 1
-pop temp 0
-push this 2
-push this 3
-call Spaceship.shot 1
-call List.addAstro 2
 pop temp 0
 push pointer 0
 call Game.drawProjList 1
@@ -364,18 +361,25 @@ call Tools.checkForCollision 2
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push this 1
-push local 1
-call List.removeAstro 2
-pop temp 0
 push this 2
 push local 0
+call List.removeAstro 2
+pop temp 0
+push local 1
+push constant 40
+call Astroid.doDmg 2
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push this 1
+push local 1
 call List.removeAstro 2
 pop temp 0
 push this 5
 push constant 1
 add
 pop this 5
+label IF_FALSE1
 label IF_FALSE0
 push local 3
 call ListElement.getNext 1

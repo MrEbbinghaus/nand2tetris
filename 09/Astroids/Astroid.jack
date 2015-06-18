@@ -55,6 +55,15 @@ class Astroid{
         return;
     }
 
+
+    method boolean doDmg(int x){
+        let health = health - x;
+        if( health < 1){
+            return true;
+        }
+        return false;
+    }
+
     method int getPosX(){ return posX; }
     method int getPosY(){ return posY; }
     method int getSize(){ return size; }
