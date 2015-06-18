@@ -107,6 +107,50 @@ push constant 1
 call Astroid.new 6
 call List.addAstro 2
 pop temp 0
+push this 1
+push constant 500
+push constant 240
+push constant 10
+push constant 100
+push constant 1
+neg
+push constant 1
+neg
+call Astroid.new 6
+call List.addAstro 2
+pop temp 0
+push this 1
+push constant 234
+push constant 240
+push constant 10
+push constant 100
+push constant 0
+push constant 1
+neg
+call Astroid.new 6
+call List.addAstro 2
+pop temp 0
+push this 1
+push constant 34
+push constant 240
+push constant 10
+push constant 100
+push constant 1
+neg
+push constant 1
+call Astroid.new 6
+call List.addAstro 2
+pop temp 0
+push this 1
+push constant 143
+push constant 34
+push constant 10
+push constant 100
+push constant 1
+push constant 2
+call Astroid.new 6
+call List.addAstro 2
+pop temp 0
 label WHILE_EXP0
 push local 0
 not

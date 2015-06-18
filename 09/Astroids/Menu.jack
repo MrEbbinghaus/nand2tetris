@@ -9,13 +9,7 @@ class Menu{
         let y2 = 159;
         let selector = 0;
 
-        do Output.moveCursor(4, 9);
-        do Output.printString("               _             _     _     _ ");       do Output.moveCursor(5, 9);
-        do Output.printString("     /\\       | |           (_)   | |   | |");      do Output.moveCursor(6, 9);
-        do Output.printString("    /  \\   ___| |_ _ __ ___  _  __| |___| |");      do Output.moveCursor(7, 9);
-        do Output.printString("   / /\\ \\ / __| __| '__/ _ \\| |/ _` / __| |");    do Output.moveCursor(8, 9);
-        do Output.printString("  / ____ \\\\__ | |_| | | (_) | | (_| \\__ |_|");    do Output.moveCursor(9, 9);
-        do Output.printString(" /_/    \\_|___/\\__|_|  \\___/|_|\\__,_|___(_)");
+        do printHeader();
 
         do drawBoarder(x, y, x2, y2, true);
 
@@ -63,7 +57,16 @@ class Menu{
                 if( selector = 0){
                     return 1;
                 }else{if( selector = 1){
-                    return 2;
+                    do Screen.clearScreen();
+                    do Output.moveCursor(13, 24);
+                    do Output.printString("Not yet :-(");
+                    do Sys.wait(1500);
+                    do Screen.clearScreen();
+                    do printHeader();
+                    do drawBoarder(x, y, x2, y2, true);
+                    let selector = 0;
+                    do drawLines();
+                    //return 2;
                 }else{if( selector = 2){
                     do Screen.clearScreen();
                     do Output.moveCursor(13, 27);
@@ -92,6 +95,17 @@ class Menu{
         do Output.printString("2 Player");
         do Output.moveCursor(17, 30);
         do Output.printString("Exit");
+        return;
+    }
+
+    method void printHeader(){
+        do Output.moveCursor(4, 10);
+        do Output.printString("               _             _     _     _ ");       do Output.moveCursor(5, 10);
+        do Output.printString("     /\\       | |           (_)   | |   | |");      do Output.moveCursor(6, 10);
+        do Output.printString("    /  \\   ___| |_ _ __ ___  _  __| |___| |");      do Output.moveCursor(7, 10);
+        do Output.printString("   / /\\ \\ / __| __| '__/ _ \\| |/ _` / __| |");    do Output.moveCursor(8, 10);
+        do Output.printString("  / ____ \\\\__ | |_| | | (_) | | (_| \\__ |_|");    do Output.moveCursor(9, 10);
+        do Output.printString(" /_/    \\_|___/\\__|_|  \\___/|_|\\__,_|___(_)");
         return;
     }
 

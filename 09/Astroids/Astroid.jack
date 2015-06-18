@@ -20,7 +20,9 @@ class Astroid{
 
     method void draw() {
         do Screen.setColor(false);
-        do Screen.drawCircle(posX, posY, size);
+        if( ((posX - size) > 1) & ((posX + size) < 511) & ((posY - size) > 1) & ((posY + size) < 255) ){
+            do Screen.drawCircle(posX, posY, size);
+        }
         return;
     }
 
@@ -44,11 +46,11 @@ class Astroid{
         let posX = posX + vX;
         let posY = posY + vY;
 
-        if(posX+size > 510){ let posX = size+Constant.BARSIZE(); }
-        else{ if(posX-size < -1){ let posX = 511+size; }}
+        if(posX+size+1 > 512){ let posX = size+1; }
+        else{ if(posX-(size+1) < 0){ let posX = 511-(size+1); }}
 
-        if(posY+size > 254){ let posY = size+Constant.BARSIZE(); }
-        else{ if(posY-size < -1){ let posY = 255+size; }}
+        if(posY+size+1 > 254){ let posY = size+Constant.BARSIZE()+1; }
+        else{ if(posY-(size+1+Constant.BARSIZE()) < 0){ let posY = 255-(size+1); }}
 
         return;
     }
@@ -56,15 +58,5 @@ class Astroid{
     method int getPosX(){ return posX; }
     method int getPosY(){ return posY; }
     method int getSize(){ return size; }
-
-    method void reverseDir(){
-        if( (posY < size+10) | (posY > (254-size)) ){
-            let vX = -vX;
-        }
-        if( (posX < size+10) | (posY > (510-size)) ){
-            let vY = -vY;
-        }
-        return;
-    }
 
 }
