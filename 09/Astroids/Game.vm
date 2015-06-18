@@ -15,6 +15,10 @@ push constant 0
 pop this 5
 push constant 0
 pop this 6
+push constant 0
+push constant 0
+call Output.moveCursor 2
+pop temp 0
 push constant 6
 call String.new 1
 push constant 83
@@ -260,8 +264,8 @@ push this 1
 push local 0
 call List.removeAstro 2
 pop temp 0
-push constant 0
-push constant 25
+push constant 12
+push constant 27
 call Output.moveCursor 2
 pop temp 0
 push constant 4
@@ -275,6 +279,8 @@ call String.appendChar 2
 push constant 68
 call String.appendChar 2
 call Output.printString 1
+pop temp 0
+call Sys.halt 0
 pop temp 0
 label IF_FALSE0
 push constant 0
