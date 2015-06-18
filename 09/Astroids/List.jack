@@ -1,0 +1,91 @@
+class List {
+    field ListElement head, next;
+
+    constructor List new(){
+        let head = null;
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        var ListElement tmp;
+        while( ~(head = null) ){
+            let tmp = getLast();
+            do tmp.dispose();
+        }
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** adds an element to the list */
+    method void add( ListElement element ){
+        var ListElement tmp;
+        if( head = null ){
+            let head = element;
+        }
+        else {
+            let tmp = getLast();
+            do tmp.setNext(element);
+        }
+        return;
+    }
+
+    method void addAstro( Astroid astro ){
+        var ListElement element;
+        if(~(astro = null) ){
+            let element =  ListElement.newAstroid( astro );
+            do add( element );
+        }
+        return;
+    }
+
+    /** returns the last element in the list */
+    method ListElement getLast(){
+        var ListElement tmp;
+        let tmp = head;
+
+        if(tmp = null){
+            return null;
+        }
+        else {
+            while( ~tmp.isLast() ){
+                let tmp = tmp.getNext();
+            }
+            return tmp;
+        }
+    }
+
+    method ListElement getHead(){
+        return head;
+    }
+
+    method void removeAstro( Astroid astro ){
+        var ListElement tmp, prev, tNext;
+        var boolean found;
+
+        let found = false;
+        let tmp = head;
+        let prev = null;
+
+        while( (~(tmp=null)) & (~(found)) ){
+            if( tmp.getAstroItem() = astro ) {
+                let tNext = tmp.getNext();
+                let found = true;
+                do tmp.dispose();
+                if(~(prev = null)){
+                    do prev.setNext(tNext);
+                }
+                else{
+                    let head = tNext;
+                }
+            }
+            else{
+                let prev = tmp;
+                let tmp = tmp.getNext();
+            }
+        }
+        return;
+    }
+
+
+}

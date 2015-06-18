@@ -1,0 +1,152 @@
+function Tools.mod 2
+push argument 0
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 0
+neg
+pop argument 0
+push constant 0
+not
+pop local 1
+goto IF_END0
+label IF_FALSE0
+push constant 0
+pop local 1
+label IF_END0
+push argument 1
+push constant 0
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push argument 0
+return
+label IF_FALSE1
+push argument 0
+pop local 0
+label WHILE_EXP0
+push argument 0
+push argument 1
+sub
+push constant 1
+neg
+gt
+not
+if-goto WHILE_END0
+push argument 0
+push argument 1
+sub
+pop argument 0
+push argument 0
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push local 1
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 0
+neg
+pop local 0
+label IF_FALSE2
+push local 0
+return
+function Tools.checkForCollision 0
+push argument 1
+call Astroid.getPosX 1
+push argument 0
+call Astroid.getPosX 1
+push argument 0
+call Astroid.getSize 1
+add
+lt
+push argument 0
+call Astroid.getPosX 1
+push argument 0
+call Astroid.getSize 1
+sub
+push argument 1
+call Astroid.getPosX 1
+lt
+and
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
+call Astroid.getPosY 1
+push argument 0
+call Astroid.getPosY 1
+push argument 0
+call Astroid.getSize 1
+add
+lt
+push argument 0
+call Astroid.getPosY 1
+push argument 0
+call Astroid.getSize 1
+sub
+push argument 1
+call Astroid.getPosY 1
+lt
+and
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+not
+return
+label IF_FALSE1
+label IF_FALSE0
+push constant 0
+return
+function Tools.checkForCollisionAS 0
+push argument 1
+call Spaceship.getPosX 1
+push argument 0
+call Astroid.getPosX 1
+push argument 0
+call Astroid.getSize 1
+add
+lt
+push argument 0
+call Astroid.getPosX 1
+push argument 0
+call Astroid.getSize 1
+sub
+push argument 1
+call Spaceship.getPosX 1
+lt
+and
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
+call Spaceship.getPosY 1
+push argument 0
+call Astroid.getPosY 1
+push argument 0
+call Astroid.getSize 1
+add
+lt
+push argument 0
+call Astroid.getPosY 1
+push argument 0
+call Astroid.getSize 1
+sub
+push argument 1
+call Spaceship.getPosY 1
+lt
+and
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+not
+return
+label IF_FALSE1
+label IF_FALSE0
+push constant 0
+return

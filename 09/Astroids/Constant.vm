@@ -1,0 +1,3 @@
+function Constant.BARSIZE 0
+push constant 12
+return

@@ -1,0 +1,171 @@
+function List.new 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+pop this 0
+push pointer 0
+return
+function List.dispose 1
+push argument 0
+pop pointer 0
+label WHILE_EXP0
+push this 0
+push constant 0
+eq
+not
+not
+if-goto WHILE_END0
+push pointer 0
+call List.getLast 1
+pop local 0
+push local 0
+call ListElement.dispose 1
+pop temp 0
+goto WHILE_EXP0
+label WHILE_END0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
+function List.add 1
+push argument 0
+pop pointer 0
+push this 0
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
+pop this 0
+goto IF_END0
+label IF_FALSE0
+push pointer 0
+call List.getLast 1
+pop local 0
+push local 0
+push argument 1
+call ListElement.setNext 2
+pop temp 0
+label IF_END0
+push constant 0
+return
+function List.addAstro 1
+push argument 0
+pop pointer 0
+push argument 1
+push constant 0
+eq
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
+call ListElement.newAstroid 1
+pop local 0
+push pointer 0
+push local 0
+call List.add 2
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function List.getLast 1
+push argument 0
+pop pointer 0
+push this 0
+pop local 0
+push local 0
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+goto IF_END0
+label IF_FALSE0
+label WHILE_EXP0
+push local 0
+call ListElement.isLast 1
+not
+not
+if-goto WHILE_END0
+push local 0
+call ListElement.getNext 1
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push local 0
+return
+label IF_END0
+function List.getHead 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function List.removeAstro 4
+push argument 0
+pop pointer 0
+push constant 0
+pop local 3
+push this 0
+pop local 0
+push constant 0
+pop local 1
+label WHILE_EXP0
+push local 0
+push constant 0
+eq
+not
+push local 3
+not
+and
+not
+if-goto WHILE_END0
+push local 0
+call ListElement.getAstroItem 1
+push argument 1
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+call ListElement.getNext 1
+pop local 2
+push constant 0
+not
+pop local 3
+push local 0
+call ListElement.dispose 1
+pop temp 0
+push local 1
+push constant 0
+eq
+not
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 1
+push local 2
+call ListElement.setNext 2
+pop temp 0
+goto IF_END1
+label IF_FALSE1
+push local 2
+pop this 0
+label IF_END1
+goto IF_END0
+label IF_FALSE0
+push local 0
+pop local 1
+push local 0
+call ListElement.getNext 1
+pop local 0
+label IF_END0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return

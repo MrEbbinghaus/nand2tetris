@@ -1,0 +1,70 @@
+class Astroid{
+    field int posX, posY, size, health, vX, vY;
+
+    constructor Astroid new(int in_posX, int in_posY, int in_size, int in_health, int in_vX, int in_vY){
+        let posX = in_posX;
+        let posY = in_posY;
+        let size = in_size;
+        let health = in_health;
+        let vX = in_vX;
+        let vY = in_vY;
+
+        return this;
+
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void draw() {
+        do Screen.setColor(false);
+        do Screen.drawCircle(posX, posY, size);
+        return;
+    }
+
+    method boolean refreshRM(){
+        let posX = posX + vX;
+        let posY = posY + vY;
+        if((posX < (0+size)) | (posX > (511-size))){
+            return false;
+        }
+        else{
+            if((posY < (0+size)) | (posY > (255-size)) ){
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    }
+
+    method void refresh(){
+        let posX = posX + vX;
+        let posY = posY + vY;
+
+        if(posX+size > 510){ let posX = size+Constant.BARSIZE(); }
+        else{ if(posX-size < -1){ let posX = 511+size; }}
+
+        if(posY+size > 254){ let posY = size+Constant.BARSIZE(); }
+        else{ if(posY-size < -1){ let posY = 255+size; }}
+
+        return;
+    }
+
+    method int getPosX(){ return posX; }
+    method int getPosY(){ return posY; }
+    method int getSize(){ return size; }
+
+    method void reverseDir(){
+        if( (posY < size+10) | (posY > (254-size)) ){
+            let vX = -vX;
+        }
+        if( (posX < size+10) | (posY > (510-size)) ){
+            let vY = -vY;
+        }
+        return;
+    }
+
+}

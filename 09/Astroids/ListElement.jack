@@ -1,0 +1,41 @@
+class ListElement{
+    field Astroid astro_item;
+
+    field ListElement next;
+
+    constructor ListElement newAstroid(Astroid a){
+        let astro_item = a;
+        let next = null;
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do astro_item.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method boolean isLast(){
+        if(next = null){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    method ListElement getNext(){
+        return next;
+    }
+
+    method void setNext(ListElement element){
+        let next = element;
+        return;
+    }
+
+    method Astroid getAstroItem(){
+        return astro_item;
+    }
+}

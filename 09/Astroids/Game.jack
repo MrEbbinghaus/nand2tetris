@@ -1,0 +1,183 @@
+class Game {
+    field int sps; //steps per second
+    field List astro_list;
+    field List proj_list;
+    field Spaceship ship;
+    field int tick;
+    field int score, time;
+
+    constructor Game new(){
+        let sps = 25;
+        let astro_list = List.new();
+        let proj_list = List.new();
+        let tick = -1;
+        let score = 0;
+        let time = 0;
+
+        do Output.printString("Score:");
+        do Output.moveCursor(0, 54);
+        do Output.printString("Time:");
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do astro_list.dispose();
+        do proj_list.dispose();
+        do ship.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void run() {
+        var boolean running;
+        var int key;
+        var Astroid astro;
+        var Astroid astro2;
+        var Astroid astro3;
+
+        let running = true;
+        let ship = Spaceship.new(256, 128, 0, 0, 87, 68, 65);
+
+        do astro_list.addAstro( Astroid.new(270, 128, 5, 100, 1, 0) );
+        do astro_list.addAstro( Astroid.new(15, 25, 10, 100, 1, 1) );
+        //do astro_list.addAstro( Astroid.new(500, 240, 10, 100, -2, -1) );
+
+
+        while(running){
+            let tick = tick + 1;
+            if(Tools.mod(tick, 1000/sps) = 0){
+                let time = time+1;
+                do printTime();
+            }
+
+            //clear screen
+            do Screen.setColor(true);
+            do Screen.drawRectangle(0, Constant.BARSIZE(), 511, 255);
+
+            do drawAstroList();
+
+
+            do ship.refresh(tick);
+            do ship.draw();
+
+            do proj_list.addAstro( ship.shot() );
+            do drawProjList();
+
+            do handleCollision( ship );
+            do checkProjCollisions();
+
+            do printScore();
+            do Sys.wait(1000/sps);
+        }
+
+        return;
+    }
+
+    /**
+    draws all astroids stored in the astro_list
+    if they hit the edge of the universe they move to the opposite position of the universe
+    */
+    method void drawAstroList(){
+        var Astroid astro;
+        var ListElement tmp;
+
+        let tmp = astro_list.getHead();
+        while( ~( tmp = null ) ){
+            let astro = tmp.getAstroItem();
+            do astro.draw();
+            do astro.refresh();
+            let tmp = tmp.getNext();
+        }
+        return;
+    }
+
+    /**
+    draws all projectiles stored in the proj_list
+    removes them if they hit the edges to the infeinte Universe (yes, that's nonsense)
+    */
+    method void drawProjList(){
+        var Astroid proj;
+        var ListElement tmp;
+
+        let tmp = proj_list.getHead();
+        while( ~( tmp = null ) ){
+            let proj = tmp.getAstroItem();
+            do proj.draw();
+            if ( ~(proj.refreshRM()) ){
+                do proj_list.removeAstro( proj );
+            }
+            let tmp = tmp.getNext();
+        }
+        return;
+    }
+
+    /**
+    DOESN'T WORK YET!
+    handles a collision between a spaceship and an astroid
+    */
+    method void handleCollision(Spaceship ship){
+        var Astroid astro;
+        let astro = ship.checkCollision(astro_list);
+        if( ~(astro = null)){
+            do astro_list.removeAstro( astro );
+            do Output.moveCursor(0,25);
+            do Output.printString("DEAD");
+        }
+        return;
+
+    }
+
+    /**
+    checks for collisions between a projectile and an astroid.
+    in case of collision delete projectile and astroid
+    then increase the score
+
+    KEEP IN MIND THAT IT'S UNSAFE TO USE EITHER OF THEM AGAIN!!!
+    */
+    method void checkProjCollisions(){
+        var Astroid proj, astro;
+        var ListElement tmp, tmp2;
+
+        let tmp = astro_list.getHead();
+        while(~(tmp = null)){
+            let tmp2 = proj_list.getHead();
+            let astro = tmp.getAstroItem();
+            while(~(tmp2 = null)){
+                let proj = tmp2.getAstroItem();
+
+                if( Tools.checkForCollision( astro, proj ) ){
+                    do astro_list.removeAstro( astro );
+                    do proj_list.removeAstro( proj );
+                    let score = score+1;
+                }
+
+                let tmp2 = tmp2.getNext();
+            }
+
+            let tmp = tmp.getNext();
+        }
+        return;
+    }
+
+    /**
+    prints the Score in the top left corner
+    */
+    method void printScore(){
+        do Output.moveCursor(0,7);
+        if ( score < 1000){
+            do Output.printInt( score );
+        }
+        return;
+    }
+
+    method void printTime(){
+        do Output.moveCursor(0,60);
+        do Output.printInt( time );
+        return;
+    }
+
+
+
+}

@@ -1,0 +1,51 @@
+class Tools{
+
+    function int mod(int x, int y){
+        var int tmp;
+        var boolean neg;
+
+        if(x<0){
+            let x = -x;
+            let neg = true;
+        }else {
+            let neg = false;
+        }
+        if(y=0){
+            return x;
+        }
+
+        let tmp = x;
+
+        while ( (x-y) > -1 ){
+
+            let x = x-y;
+            let tmp = x;
+        }
+
+        if(neg){
+            let tmp = -tmp;
+        }
+        return tmp;
+    }
+
+    /**b should be the projectile with size = 1*/
+    function boolean checkForCollision(Astroid a, Astroid b){
+        if( (b.getPosX() < (a.getPosX() + a.getSize()))  & ((a.getPosX() - a.getSize()) < b.getPosX() )){
+            if ( (b.getPosY() < ( a.getPosY() + a.getSize())) & ((a.getPosY() -a.getSize()) < b.getPosY() )){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function boolean checkForCollisionAS(Astroid a, Spaceship b){
+        if( (b.getPosX() < (a.getPosX() + a.getSize()))  & ((a.getPosX() - a.getSize()) < b.getPosX() )){
+            if ( (b.getPosY() < ( a.getPosY() + a.getSize())) & ((a.getPosY() -a.getSize()) < b.getPosY() )){
+                return true;
+            }
+        }
+
+        return false;
+    }
+}

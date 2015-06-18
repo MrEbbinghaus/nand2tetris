@@ -1,0 +1,228 @@
+class Spaceship{
+    field int posX, posY, vX, vY, dimX, dimY;
+    field int dir, speed; //up=0, up_right=1, right=2, down_right=3, down=4, down_left=5, left=6, up_left=7
+    field int key;
+    field int keyS, keyR, keyL;
+    field int keyPollRate;
+
+    constructor Spaceship new(int in_posX, int in_posY, int in_vX, int in_vY, int in_key_speed, int in_key_r, int in_key_l){
+        let posX = in_posX;
+        let posY = in_posY;
+        let vX = in_vX;
+        let vY = in_vY;
+        let keyS = in_key_speed;
+        let keyR = in_key_r;
+        let keyL = in_key_l;
+        let dimX = 3; //half of the ship
+        let dimY = 3;
+        let keyPollRate = 3;
+
+
+        return this;
+    }
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void refresh(int tick){
+
+
+        let key = Keyboard.keyPressed();
+
+
+        if (key = keyS){
+            if(speed < 2){
+                let speed = speed+1;
+            }
+        }
+        if(Tools.mod(tick, keyPollRate) = 0 ){
+        if(key = keyL){
+            let dir = Tools.mod( dir+7, 8 );
+
+        }else{if(key = keyR){
+            let dir = Tools.mod( dir+1, 8 );
+
+        }else{
+            /*if((speed > 0) & (Tools.mod(tick, keyPollRate) = 0)){
+                let speed = speed-1;
+            }*/
+        }}}
+
+        do refreshV();
+
+
+        let posX = posX + vX;
+        let posY = posY + vY;
+
+        if(posX+3 > 511){ let posX = 4+Constant.BARSIZE(); }
+        else{ if(posX-3 < Constant.BARSIZE()){ let posX = 508; }}
+
+        if(posY+3 > 255){ let posY = 4+Constant.BARSIZE(); }
+        else{ if(posY-3 < Constant.BARSIZE()){ let posY = 251; }}
+
+        return;
+    }
+
+    method void refreshV(){
+        if((dir=0) | (dir=1) | (dir=7)){
+            let vY = -speed;
+        }else {
+            if((dir=3) | (dir=4) | (dir=5)){
+                let vY = speed;
+            }
+            else {
+                let vY = 0;
+            }
+        }
+
+        if((dir=5)|(dir=6)|(dir=7)){
+            let vX = -speed;
+        }else {
+            if((dir=1) | (dir=2) | (dir=3)){
+                let vX = speed;
+            }
+            else {
+                let vX = 0;
+            }
+        }
+        return;
+    }
+
+    method Astroid checkCollision(List astro_list){
+        var ListElement tmp;
+        var Astroid astro;
+
+        let tmp = astro_list.getHead();
+        while( ~( tmp = null ) ){
+            let astro = tmp.getAstroItem();
+
+            //checkCollision
+
+            if (Tools.checkForCollisionAS( astro, this ) ) {
+                return astro;
+            }
+
+
+
+            ////////
+
+
+            let tmp = tmp.getNext();
+        }
+
+        return null;
+
+    }
+
+    method Astroid shot(){
+        var int vPX, vPY;
+        if(Keyboard.keyPressed() = 32){
+            if((dir=0) | (dir=1) | (dir=7)){
+                let vPY = -3;
+            }else {
+                if((dir=3) | (dir=4) | (dir=5)){
+                    let vPY = 3;
+                }
+                else {
+                    let vPY = 0;
+                }
+            }
+
+            if((dir=5)|(dir=6)|(dir=7)){
+                let vPX = -3;
+            }else {
+                if((dir=1) | (dir=2) | (dir=3)){
+                    let vPX = 3;
+                }
+                else {
+                    let vPX = 0;
+                }
+            }
+
+            return Astroid.new(posX, posY, 1,0, vPX, vPY);
+        }
+        else {
+            return null;
+        }
+    }
+
+    method void draw(){
+        do Screen.setColor(false);
+
+
+        if(dir = 0){
+            do Screen.drawRectangle(posX-2, posY-1, posX+2, posY+2);
+            do Screen.drawLine(posX-1, posY-2, posX+1, posY-2);
+            do Screen.drawPixel(posX, posY-3);
+            do Screen.drawLine(posX-3, posY+2, posX-3, posY+3);
+            do Screen.drawLine(posX+3, posY+2, posX+3, posY+3);
+        }
+        else{if(dir = 2){
+            do Screen.drawRectangle(posX-2, posY-2, posX+1, posY+2);
+            do Screen.drawLine(posX+2, posY-1, posX+2, posY+1);
+            do Screen.drawPixel(posX+3, posY);
+            do Screen.drawLine(posX-3, posY-3, posX-2, posY-3);
+            do Screen.drawLine(posX-3, posY+3, posX-2, posY+3);
+        }
+        else{if(dir = 4){
+            do Screen.drawRectangle(posX-2, posY-2, posX+2, posY+1);
+            do Screen.drawLine(posX+1, posY+2, posX-1, posY+2);
+            do Screen.drawPixel(posX, posY+3);
+            do Screen.drawLine(posX+3, posY-2, posX+3, posY-3);
+            do Screen.drawLine(posX-3, posY-2, posX-3, posY-3);
+        }
+        else{if(dir = 6){
+            do Screen.drawRectangle(posX-1, posY-2, posX+2, posY+2);
+            do Screen.drawLine(posX-2, posY+1, posX-2, posY-1);
+            do Screen.drawPixel(posX-3, posY);
+            do Screen.drawLine(posX+3, posY+3, posX+2, posY+3);
+            do Screen.drawLine(posX+3, posY-3, posX+2, posY-3);
+        }
+        else{if(dir = 1){
+            do Screen.drawLine(posX, posY-2, posX+2, posY-2);
+            do Screen.drawLine(posX-2, posY-1, posX+2, posY-2);
+            do Screen.drawLine(posX-3, posY, posX+2, posY);
+            do Screen.drawLine(posX-1, posY+1, posX+1, posY+1);
+            do Screen.drawLine(posX, posY+2, posX+1, posY+2);
+            do Screen.drawPixel(posX, posY+3);
+        }
+        else{if(dir = 3){
+            do Screen.drawLine(posX, posY+2, posX+2, posY+2);
+            do Screen.drawLine(posX-2, posY+1, posX+2, posY+1);
+            do Screen.drawLine(posX-3, posY, posX+2, posY);
+            do Screen.drawLine(posX-1, posY-1, posX+1, posY-1);
+            do Screen.drawLine(posX, posY-2, posX+1, posY-2);
+            do Screen.drawPixel(posX, posY-3);
+        }
+        else{if(dir = 7){
+            do Screen.drawLine(posX-2, posY-2, posX, posY-2);
+            do Screen.drawLine(posX-2, posY-1, posX+2, posY-2);
+            do Screen.drawLine(posX-2, posY, posX+3, posY);
+            do Screen.drawLine(posX-1, posY+1, posX+1, posY+1);
+            do Screen.drawLine(posX-1, posY+2, posX, posY+2);
+            do Screen.drawPixel(posX, posY+3);
+        }
+        else{if(dir = 5){
+            do Screen.drawLine(posX-2, posY+2, posX, posY+2);
+            do Screen.drawLine(posX-2, posY+1, posX+2, posY+2);
+            do Screen.drawLine(posX-2, posY, posX+3, posY);
+            do Screen.drawLine(posX-1, posY-1, posX+1, posY-1);
+            do Screen.drawLine(posX-1, posY-2, posX, posY-2);
+            do Screen.drawPixel(posX, posY-3);
+        }
+        }}}}}}}
+
+        return;
+    }
+
+    method void setKey(int in){
+        let key = in;
+        return;
+    }
+
+    method int getPosX(){ return posX; }
+    method int getPosY(){ return posY; }
+
+}
