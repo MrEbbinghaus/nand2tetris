@@ -1,22 +1,20 @@
 import re
 import xml.etree.ElementTree as ET
-#from lxml import etree as ET
 import xml.dom.minidom as minidom
+from CompilationEngine import CompilationEngine
 
 from sys import argv
 from sys import exit
 from os import listdir
 from os.path import join
 
-keyword = {"class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return"}
-symbol = {"{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~"}
-keyword2 = "(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)"
-symbol2 = r"{|}|\(|\)|\[|\]|\.|,|;|\+|-|\*|/|&|\||<|>|=|~"
-integerConstant = re.compile(r"[0-32767]")
+keywords = r"class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return"
+symbols = r"{|}|\(|\)|\[|\]|\.|,|;|\+|-|\*|/|&|\||<|>|=|~"
+integerConstant = re.compile(r"\d+")
 StringConstant = re.compile(r"\".*?\"")
 identifier = re.compile(r"[a-zA-Z_]\w*", flags=re.ASCII)
 multilineComment = re.compile(r"/\*\*?.*?\*/", flags=re.DOTALL)
-allElements = r"[0-32767]|\".*?\"|[a-zA-Z_]\w*|class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return|{|}|\(|\)|\[|\]|\.|,|;|\+|-|\*|/|&|\||<|>|=|~"
+allElements = r"\d+|\".*?\"|[a-zA-Z_]\w*|class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return|{|}|\(|\)|\[|\]|\.|,|;|\+|-|\*|/|&|\||<|>|=|~"
 
 
 def main():
@@ -24,8 +22,11 @@ def main():
 
     for file in listdir(inputPath):
         if(file.endswith(".jack")):
-            tokenize(join(inputPath, file))
-
+            print("Compiling: " + str(file))
+            tokens = tokenize(join(inputPath, file))
+            compilationEngine = CompilationEngine(tokens)
+            with open(join(inputPath, file).replace(".jack", ".out.xml"), "w") as f:
+                f.write(str(compilationEngine))
 
 def tokenize(fileName):
     root = ET.Element("tokens")
@@ -43,10 +44,12 @@ def tokenize(fileName):
         if re.match(integerConstant, element):
             item = "integerConstant"
         elif re.match(StringConstant, element):
+            item = "stringConstant"
+            element = element.strip("\"")
             item = "StringConstant"
-        elif re.match(keyword2, element):
+        elif re.match(keywords, element):
             item = "keyword"
-        elif re.match(symbol2, element):
+        elif re.match(symbols, element):
             item = "symbol"
         elif re.match(identifier, element):
             item = "identifier"
@@ -57,7 +60,7 @@ def tokenize(fileName):
 
     with open(fileName, "w") as file:
         file.write(prettify(root))
-
+    return root;
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
